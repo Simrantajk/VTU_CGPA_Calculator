@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculate CGPA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #3498db;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: #b1f2ff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: darkblue;
+        }
+        input[type="number"] {
+            padding: 10px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .submit-btn {
+            background-color: rgb(207, 112, 216);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .submit-btn:hover {
+            background-color: #27ae60;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+        h2{
+            color: darkblue;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculate CGPA</h1>
+        <form id="cgpaForm">
+            <label for="semesters">Enter number of semesters completed (1-8):</label><br>
+            <input type="number" id="semesters" name="semesters" min="1" max="8" required><br><br>
+            <button type="button" onclick="generateSGPAInputs()">Generate Input Fields</button>
+        </form>
+        
+        <div id="sgpaInputs" style="display: none;">
+            <h2>Enter SGPA for each semester</h2>
+            <form id="sgpaForm">
+                <!-- SGPA input fields will be generated here -->
+            </form>
+            <br>
+            <button type="button" class="submit-btn" onclick="calculateCGPA()">Calculate CGPA</button>
+            <div id="result" class="result" style="display: none;">
+                <h3>CGPA Calculation Result</h3>
+                <p id="averageCGPA"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function generateSGPAInputs() {
+            var semesters = parseInt(document.getElementById('semesters').value);
+            if (isNaN(semesters) || semesters < 1 || semesters > 8) {
+                alert("Please enter a valid number of semesters (1-8).");
+                return;
+            }
+
+            var sgpaForm = document.getElementById('sgpaForm');
+            sgpaForm.innerHTML = '';  // Clear previous inputs if any
+
+            for (var i = 1; i <= semesters; i++) {
+                var label = document.createElement('label');
+                label.textContent = "SGPA for Semester " + i + ":";
+                sgpaForm.appendChild(label);
+                
+                var input = document.createElement('input');
+                input.type = "number";
+                input.name = "sgpa_sem_" + i;
+                input.min = "0";
+                input.max = "10";
+                input.step = "0.01";
+                input.required = true;
+                sgpaForm.appendChild(input);
+                
+                sgpaForm.appendChild(document.createElement('br'));
+            }
+            
+            document.getElementById('sgpaInputs').style.display = 'block';
+        }
+
+        function calculateCGPA() {
+            var sgpaForm = document.getElementById('sgpaForm');
+            var inputs = sgpaForm.querySelectorAll('input[type="number"]');
+            var totalSGPA = 0;
+            var semesters = inputs.length;
+
+            for (var i = 0; i < semesters; i++) {
+                var sgpa = parseFloat(inputs[i].value);
+                totalSGPA += sgpa;
+            }
+
+            var averageCGPA = totalSGPA / semesters;
+            
+            // Display the result
+            document.getElementById('averageCGPA').textContent = "Average CGPA: " + averageCGPA.toFixed(2);
+            document.getElementById('result').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

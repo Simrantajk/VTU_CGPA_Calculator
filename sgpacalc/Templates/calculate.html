@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SGPA Calculator - Select Scheme, Branch, and Semester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #3498db;
+            color: #fff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        label {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+        select, input[type="number"] {
+            padding: 10px;
+            font-size: 1em;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .submit-btn {
+            background-color: rgb(207, 112, 216);
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .submit-btn:hover {
+            background-color: #27ae60;
+        }
+        table {
+            width: 100%;
+            margin-top: 20px;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+            color: darkblue;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .sgpa-result {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Calculate SGPA</h1>
+        <h3><a class="calculate-btn" href="{% url 'add' %}">Add Scheme</a></h3>
+        <form method="post" action="{% url 'calculate' %}">
+            {% csrf_token %}
+            <label for="scheme">Scheme:</label>
+            <select name="scheme" id="scheme">
+                <option value="">Select Scheme</option>
+                {% for scheme in schemes %}
+                    <option value="{{ scheme.scheme_id }}">{{ scheme.scheme }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <label for="branch">Branch:</label>
+            <select name="branch" id="branch">
+                <option value="">Select Branch</option>
+                {% for branch in branches %}
+                    <option value="{{ branch.branch_id }}">{{ branch.name }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <label for="semester">Semester:</label>
+            <select name="semester" id="semester">
+                <option value="">Select Semester</option>
+                {% for semester in semesters %}
+                    <option value="{{ semester.sem_id }}">Semester {{ semester.sem }}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <button type="button" onclick="showSubjects()">Show Subjects</button>
+
+            <div id="subjectInputs" style="display: none;">
+                <h2>Subjects</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Course ID</th>
+                            <th>Title</th>
+                            <th>Credits</th>
+                            <th>Max Marks</th>
+                            <th>Obtained Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="subjectTableBody">
+                        <!-- Subjects will be dynamically added here -->
+                    </tbody>
+                </table>
+                <br>
+                <button type="button" onclick="calculateSGPA()" class="submit-btn">Calculate SGPA</button>
+                <div id="sgpaResult" class="sgpa-result"></div>
+                <button type="button" onclick="window.location.href='{% url 'cgpa' %}'">Calculate CGPA</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function showSubjects() {
+            var schemeId = document.getElementById('scheme').value;
+            var branchId = document.getElementById('branch').value;
+            var semesterId = document.getElementById('semester').value;
+
+            if (schemeId && branchId && semesterId) {
+                console.log(`Fetching subjects for Scheme: ${schemeId}, Branch: ${branchId}, Semester: ${semesterId}`);
+                fetchSubjects(schemeId, branchId, semesterId);
+                document.getElementById('subjectInputs').style.display = 'block';
+            } else {
+                alert('Please select Scheme, Branch, and Semester.');
+            }
+        }
+
+        function fetchSubjects(schemeId, branchId, semesterId) {
+            fetch(`/fetch_subjects/?scheme=${schemeId}&branch=${branchId}&semester=${semesterId}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Fetched subjects:', data);
+                    var subjectTableBody = document.getElementById('subjectTableBody');
+                    subjectTableBody.innerHTML = '';
+                    data.forEach(subject => {
+                        var row = `
+                            <tr>
+                                <td>${subject.course_id}</td>
+                                <td>${subject.title}</td>
+                                <td>${subject.credits}</td>
+                                <td>${subject.max_marks}</td>
+                                <td><input type="number" name="marks_${subject.course_id}" required></td>
+                            </tr>
+                        `;
+                        subjectTableBody.innerHTML += row;
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching subjects:', error);
+                });
+        }
+
+        function calculateSGPA() {
+            var rows = document.querySelectorAll('#subjectTableBody tr');
+            var totalCredits = 0;
+            var totalPoints = 0;
+
+            rows.forEach(row => {
+                var credits = parseFloat(row.cells[2].innerText);
+                var maxMarks = parseFloat(row.cells[3].innerText);
+                var obtainedMarks = parseFloat(row.cells[4].querySelector('input').value);
+                var grade = getGrade(obtainedMarks, maxMarks);
+                totalCredits += credits;
+                totalPoints += credits * grade;
+            });
+
+            var sgpa = totalPoints / totalCredits;
+            document.getElementById('sgpaResult').innerText = `Your SGPA is: ${sgpa.toFixed(2)}`;
+        }
+
+        function getGrade(obtainedMarks, maxMarks) {
+            var percentage = (obtainedMarks / maxMarks) * 100;
+            if (percentage >= 90) return 10;
+            if (percentage >= 80) return 9;
+            if (percentage >= 70) return 8;
+            if (percentage >= 60) return 7;
+            if (percentage >= 50) return 6;
+            if (percentage >= 40) return 5;
+            return 0;
+        }
+    </script>
+</body>
+</html>

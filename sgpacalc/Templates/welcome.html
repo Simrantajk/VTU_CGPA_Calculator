@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to SGPA & CGPA Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #3498db; /* Background color changed to a shade of blue */
+            color: #fff; /* Text color set to white */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column; /* Change flex direction to column */
+            align-items: center;
+            min-height: 100vh; /* Use min-height to ensure content stretches if necessary */
+            text-align: center;
+        }
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.9); /* White background with slight transparency */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Soft shadow effect */
+            border-radius: 8px;
+            margin-top: 20px; /* Add margin to the top */
+        }
+        h1 {
+            color: #2c3e50; /* Dark blue color for headings */
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+        }
+        .calculate-btn {
+            background-color: rgb(207, 112, 216); /* Purple color for button */
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            font-size: 1em;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none; /* Remove default link underline */
+            transition: background-color 0.3s ease; /* Smooth hover effect */
+        }
+        .calculate-btn:hover {
+            background-color: #3027ae; /* Darker green on hover */
+        }
+        .description {
+            max-width: 600px;
+            padding: 20px;
+            background-color:  #3498db; /* White background with slight transparency */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Soft shadow effect */
+            border-radius: 8px;
+            text-align: left; /* Align text to the left */
+            margin: 20px auto; /* Center align horizontally and add margin to the top and bottom */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the SGPA and CGPA Calculator</h1>
+        <a class="calculate-btn" href="{% url 'calculate' %}">Calculate Now</a> <!-- Use Django's URL template tag -->
+    </div>
+    
+    <div class="description">
+        <p>Calculate your Semester Grade Point Average (SGPA) and Cumulative Grade Point Average (CGPA) easily with this app.</p>
+        <p>This website is designed to help VTU (Visvesvaraya Technological University) students understand and compute their grades based on the VTU grading system. SGPA and CGPA are important indicators of academic performance in VTU's engineering and technical courses.</p>
+        <h2>How SGPA is Calculated:</h2>
+        <p>SGPA is calculated by dividing the sum of the product of credits and grade points obtained in each course by the total number of credits.</p>
+        <p>Formula:</p>
+        <p style="font-family: 'Courier New', monospace;">SGPA = (Σ (Ci * Gi)) / Σ Ci</p>
+        <p>where:</p>
+        <ul style="text-align: left; margin-left: 40px;">
+            <li>Σ (Ci * Gi) = Sum of (Credits of the course * Grade points obtained in the course)</li>
+            <li>Σ Ci = Total number of credits of all courses</li>
+        </ul>
+    </div>
+</body>
+</html>

@@ -1,0 +1,16 @@
+# Virtual environment
+venv/
+env/
+
+# Ignore database files
+db.sqlite3
+
+# Ignore staticfiles
+staticfiles/
+
+# Ignore local settings file
+local_settings.py
+
+# Ignore other sensitive or generated files
+.DS_Store
+*.pyc
