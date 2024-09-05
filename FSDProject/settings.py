@@ -77,10 +77,10 @@ WSGI_APPLICATION = 'FSDProject.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'sgpa',
-        'USER':'root',
-        'PASSWORD':'simsim123',
-        'HOST':'localhost',
+        'NAME': 'simsimi$vtu',
+        'USER':'simsimi',
+        'PASSWORD':'Math@143',
+        'HOST':'simsimi.mysql.pythonanywhere-services.com',
         'PORT':'3306',
     }
 }
